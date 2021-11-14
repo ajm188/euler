@@ -4,18 +4,10 @@ import (
 	"context"
 	"flag"
 	"fmt"
-	"math"
+	stdmath "math"
+
+	"github.com/ajm188/euler/math"
 )
-
-func isPrime(n int) bool {
-	for i := 2; i <= int(math.Sqrt(float64(n))); i++ {
-		if n%i == 0 {
-			return false
-		}
-	}
-
-	return true
-}
 
 func primes(ctx context.Context, n int) chan int {
 	ch := make(chan int, n)
@@ -29,7 +21,7 @@ func primes(ctx context.Context, n int) chan int {
 			default:
 			}
 
-			if isPrime(i) {
+			if math.IsPrime(i) {
 				ch <- i
 			}
 		}
@@ -44,7 +36,7 @@ func main() {
 	flag.Parse()
 
 	ctx, cancel := context.WithCancel(context.Background())
-	ch := primes(ctx, int(math.Sqrt(float64(*n))))
+	ch := primes(ctx, int(stdmath.Sqrt(float64(*n))))
 	for x := range ch {
 		if *n%x == 0 {
 			cancel()
