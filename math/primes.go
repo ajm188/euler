@@ -11,3 +11,20 @@ func IsPrime(n int) bool {
 
 	return true
 }
+
+func FirstNPrimes(n int) chan int {
+	ch := make(chan int, n)
+	go func() {
+		defer close(ch)
+
+		count := 0
+		for i := 2; count < n; i++ {
+			if IsPrime(i) {
+				ch <- i
+				count++
+			}
+		}
+	}()
+
+	return ch
+}
