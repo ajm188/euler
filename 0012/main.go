@@ -4,8 +4,8 @@ import (
 	"context"
 	"flag"
 	"fmt"
-	"math"
-	"sort"
+
+	"github.com/ajm188/euler/math"
 )
 
 func triangleNumbers(ctx context.Context, n int) chan int {
@@ -48,16 +48,7 @@ func (fi *factoredInt) Factors() []int {
 		return fi.factors
 	}
 
-	for i := 1; i <= int(math.Sqrt(float64(fi.n))); i++ {
-		if fi.n%i == 0 {
-			fi.factors = append(fi.factors, i)
-			if div := fi.n / i; div != i { // if i == sqrt(fi.n), don't add it twice
-				fi.factors = append(fi.factors, div)
-			}
-		}
-	}
-
-	sort.Ints(fi.factors)
+	fi.factors = math.Factors(fi.n)
 	return fi.factors
 }
 
