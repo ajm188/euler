@@ -3,25 +3,13 @@ package main
 import (
 	"flag"
 	"fmt"
-	"io"
+	stdio "io"
 	"log"
-	"os"
 	"sort"
 	"strings"
+
+	"github.com/ajm188/euler/io"
 )
-
-func open(path string) (io.Reader, func() error, error) {
-	if path == "" {
-		return os.Stdin, func() error { return nil }, nil
-	}
-
-	f, err := os.Open(path)
-	if err != nil {
-		return nil, nil, err
-	}
-
-	return f, f.Close, nil
-}
 
 func score(name string) int {
 	tally := 0
@@ -36,13 +24,13 @@ func main() {
 	path := flag.String("path", "names.txt", "")
 	flag.Parse()
 
-	r, closer, err := open(*path)
+	r, err := io.Open(*path)
 	if err != nil {
 		log.Fatal(err)
 	}
-	defer closer()
+	defer r.Close()
 
-	data, err := io.ReadAll(r)
+	data, err := stdio.ReadAll(r)
 	if err != nil {
 		log.Fatal(err)
 	}
