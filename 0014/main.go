@@ -3,7 +3,7 @@ package main
 import (
 	"fmt"
 
-	"github.com/ajm188/euler/math/collatz"
+	"github.com/ajm188/euler/math/sequences/collatz"
 )
 
 func main() {
