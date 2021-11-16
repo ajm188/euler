@@ -9,16 +9,8 @@ import (
 	"strings"
 
 	"github.com/ajm188/euler/io"
+	"github.com/ajm188/euler/text"
 )
-
-func score(name string) int {
-	tally := 0
-	for _, c := range name {
-		tally += (int(c) - 64) // A = 1, B = 2, ..., Z = 26
-	}
-
-	return tally
-}
 
 func main() {
 	path := flag.String("path", "names.txt", "")
@@ -41,7 +33,7 @@ func main() {
 	totalScore := 0
 	for i, name := range names {
 		pos := i + 1
-		totalScore += pos * score(strings.ReplaceAll(name, `"`, ""))
+		totalScore += pos * text.WordScore(strings.ReplaceAll(name, `"`, ""))
 	}
 
 	fmt.Println(totalScore)
