@@ -12,7 +12,7 @@ func main() {
 	flag.Parse()
 
 	ch := math.PrimesUntil(*n, func(x, i int) bool {
-		return x < *n
+		return x >= *n
 	})
 	sum := 0
 	for x := range ch {

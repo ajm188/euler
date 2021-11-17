@@ -29,7 +29,7 @@ func FirstNPrimes(n int) chan int {
 	return ch
 }
 
-// PrimesUntil generates primes until the condition func returns false.
+// PrimesUntil generates primes until the condition func returns true.
 //
 // Params:
 //	n: capacity for the channel
@@ -45,7 +45,7 @@ func PrimesUntil(n int, f func(n, i int) bool) chan int {
 		count := 0
 		done := false
 		for i := 2; !done; i++ {
-			done = !f(i, count)
+			done = f(i, count)
 
 			if IsPrime(i) {
 				ch <- i
