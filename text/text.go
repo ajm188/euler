@@ -1,5 +1,17 @@
 package text
 
+// IsPalindrome returns true if s is a palindrome; that is, if s == reverse(s).
+func IsPalindrome(s string) bool {
+	for i := 0; i < len(s)/2; i++ {
+		j := (len(s) - 1) - i
+		if s[i] != s[j] {
+			return false
+		}
+	}
+
+	return true
+}
+
 // WordScore returns a scoring of the fully-uppercased string s.
 //
 // A score is defined as the sum of each letter in s's position in the alphabet,

@@ -1,4 +1,4 @@
-package main
+package text
 
 import "testing"
 
@@ -21,9 +21,9 @@ func TestIsPalindrome(t *testing.T) {
 	for _, tt := range tests {
 		tt := tt
 		t.Run(tt.in, func(t *testing.T) {
-			out := isPalindrome(tt.in)
+			out := IsPalindrome(tt.in)
 			if out != tt.out {
-				t.Errorf("isPalindrome(%v) got %v want %v", tt.in, out, tt.out)
+				t.Errorf("IsPalindrome(%v) got %v want %v", tt.in, out, tt.out)
 			}
 		})
 	}

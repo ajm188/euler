@@ -4,18 +4,9 @@ import (
 	"flag"
 	"fmt"
 	"math"
+
+	"github.com/ajm188/euler/text"
 )
-
-func isPalindrome(x string) bool {
-	for i := 0; i < len(x)/2; i++ {
-		j := (len(x) - 1) - i
-		if x[i] != x[j] {
-			return false
-		}
-	}
-
-	return true
-}
 
 func main() {
 	digits := flag.Int("digits", 2, "")
@@ -28,7 +19,7 @@ func main() {
 	for i := start; i < stop; i++ {
 		for j := start; j < stop; j++ {
 			product := i * j
-			if isPalindrome(fmt.Sprintf("%d", product)) {
+			if text.IsPalindrome(fmt.Sprintf("%d", product)) {
 				if product > largest {
 					largest = product
 				}
