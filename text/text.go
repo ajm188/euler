@@ -12,6 +12,16 @@ func IsPalindrome(s string) bool {
 	return true
 }
 
+// Reverse returns s backwards.
+func Reverse(s string) string {
+	buf := make([]byte, 0, len(s))
+	for i := len(s) - 1; i >= 0; i-- {
+		buf = append(buf, s[i])
+	}
+
+	return string(buf)
+}
+
 // WordScore returns a scoring of the fully-uppercased string s.
 //
 // A score is defined as the sum of each letter in s's position in the alphabet,
