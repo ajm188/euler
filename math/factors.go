@@ -5,6 +5,24 @@ import (
 	"sort"
 )
 
+func IsDeficient(n int) bool { return Perfection(n) < 0 }
+func IsPerfect(n int) bool   { return Perfection(n) == 0 }
+func IsAbundant(n int) bool  { return Perfection(n) > 0 }
+
+// Perfection returns the perfection score of a number.
+//
+// A perfect number is a number for which the sum of its proper divisors is
+// exactly equal to the number. If the sum of the proper divisors is less than
+// the number, that number is deficient. If the sum is greater, that number is
+// abundant.
+//
+// Perfection returns < 0 if n is deficient, exactly 0 if n is perfect, and > 0
+// if n is abundant.
+func Perfection(n int) int {
+	sum := SumInts(ProperDivisors(n))
+	return sum - n
+}
+
 // Factors returns a sorted list of the factors of n. The factors of an integer
 // n are all natural numbers i <= n such that n%i==0, including both 1 and n
 // itself.
