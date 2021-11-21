@@ -33,7 +33,15 @@ wherever possible.
 */
 package roman
 
-import "strings"
+import (
+	"errors"
+	"fmt"
+	"strings"
+)
+
+// ErrInvalidFormat is returned when Parse is called on an invalid numeral
+// representation.
+var ErrInvalidFormat = errors.New("invalid numeral format")
 
 // Numeral is number that can be expressed in Roman numerals.
 // Negative numbers and zero have undefined behavior.
@@ -115,35 +123,18 @@ func format(n uint) string {
 	return buf.String()
 }
 
+// IsValid returns true if the given string is a valid Roman numeral.
 func IsValid(s string) bool {
-	panic("unimplemented!")
-}
-
-var (
-	orderedNumerals = []byte{'I', 'V', 'X', 'L', 'C', 'D', 'M'}
-	numeralValues   = map[byte]uint{
-		'I': 1,
-		'V': 5,
-		'X': 10,
-		'L': 50,
-		'C': 100,
-		'D': 500,
-		'M': 1000,
-	}
-	numeralIndexes map[byte]int
-)
-
-func init() {
-	numeralIndexes = make(map[byte]int, len(orderedNumerals))
-	for i, n := range orderedNumerals {
-		numeralIndexes[n] = i
-	}
+	return validate(s) == nil
 }
 
 // Parse converts a string representation of a Roman numeral into a Numeral.
 // It returns an error if the numeral is in an invalid format.
 func Parse(s string) (Numeral, error) {
-	// TODO: implement IsValid and return error
+	if err := validate(s); err != nil {
+		return 0, err
+	}
+
 	n := uint(0)
 	i := 0
 	for i < len(s)-1 {
@@ -162,4 +153,114 @@ func Parse(s string) (Numeral, error) {
 	}
 
 	return Numeral(n), nil
+}
+
+var (
+	orderedNumerals = []byte{'I', 'V', 'X', 'L', 'C', 'D', 'M'}
+	numeralValues   = map[byte]uint{
+		'I': 1,
+		'V': 5,
+		'X': 10,
+		'L': 50,
+		'C': 100,
+		'D': 500,
+		'M': 1000,
+	}
+)
+
+func validate(s string) error {
+	if len(s) == 0 {
+		return nil
+	}
+
+	s = strings.ToUpper(s)
+
+	globalCounts := map[byte]int{}
+	for _, c := range orderedNumerals {
+		globalCounts[c] = 0
+	}
+
+	checkBasic := func(current byte, count int) error {
+		// Basic rule #2: M, C, and X cannot be equalled or exceeded by
+		// smaller denominations.
+		for _, c := range []byte{'M', 'C', 'X'} {
+			if numeralValues[current] >= numeralValues[c] {
+				// Not a smaller denomination
+				continue
+			}
+
+			if count*int(numeralValues[current]) >= int(numeralValues[c]) {
+				return fmt.Errorf("%w: %d %c's should be (partially) replaced with equivalent %c", ErrInvalidFormat, count, current, c)
+			}
+		}
+
+		// Basic rule #3: D, L, and V can each appear only once.
+		for _, c := range []byte{'D', 'L', 'V'} {
+			if globalCounts[c] > 1 {
+				return fmt.Errorf("%w: at most 1 %c may appear", ErrInvalidFormat, c)
+			}
+		}
+
+		return nil
+	}
+
+	current := s[0]
+	count := 1
+	globalCounts[current]++
+
+	for i := 1; i < len(s); i++ {
+		globalCounts[s[i]]++
+
+		if numeralValues[s[i]] > numeralValues[current] { // Subtractive pair
+			// Subtractive rule #1: Only one I, X, and C can be used as the
+			// leading numeral in part of a subtractive pair.
+			switch current {
+			case 'I', 'X', 'C':
+			default:
+				return fmt.Errorf("%w: %c may not be used as the leading numeral in a subtractive pair", ErrInvalidFormat, current)
+			}
+			if count > 1 {
+				return fmt.Errorf("%w: only one (have %d) %c allowed as leading numeral in a subtractive pair", ErrInvalidFormat, count, current)
+			}
+
+			switch current {
+			case 'I':
+				// Subtractive rule #2: I can only be placed before V and X.
+				switch s[i] {
+				case 'V', 'X':
+				default:
+					return fmt.Errorf("%w: I can only be placed before V and X (not %c)", ErrInvalidFormat, s[i])
+				}
+			case 'X':
+				// Subtractive rule #3: X can only be placed before L and C.
+				switch s[i] {
+				case 'L', 'C':
+				default:
+					return fmt.Errorf("%w: X can only be placed before L and C (not %c)", ErrInvalidFormat, s[i])
+				}
+			case 'C':
+				// Subtractive rule #4: C can only be placed before D and M.
+				switch s[i] {
+				case 'D', 'M':
+				default:
+					return fmt.Errorf("%w: C can only be placed before D and M (not %c)", ErrInvalidFormat, s[i])
+				}
+			}
+		} else if numeralValues[s[i]] < numeralValues[current] {
+			if err := checkBasic(current, count); err != nil {
+				return err
+			}
+
+			current = s[i]
+			count = 1
+		} else {
+			count++
+		}
+	}
+
+	if err := checkBasic(current, count); err != nil {
+		return err
+	}
+
+	return nil
 }

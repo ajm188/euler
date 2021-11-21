@@ -5,6 +5,48 @@ import (
 	"testing"
 )
 
+func TestIsValid(t *testing.T) {
+	t.Parallel()
+
+	tests := []struct {
+		in    string
+		valid bool
+	}{
+		{"XVI", true},
+		{"XIIIIII", true},
+		{"IIIIIIIIIIIIIIII", false},
+		{"VVVI", false},
+
+		{"XIX", true},
+		{"XVIV", false},
+		{"XIIIIIIIII", true},
+		{"XVIIII", true},
+
+		{"IIII", true},
+		{"IV", true},
+
+		{"IL", false},
+		{"XXXXIIIIIIIII", true},
+		{"XXXXVIIII", true},
+		{"XXXXIX", true},
+		{"XLIIIIIIIII", true},
+		{"XLVIIII", true},
+		{"XLIX", true},
+	}
+
+	for _, tt := range tests {
+		tt := tt
+		t.Run(tt.in, func(t *testing.T) {
+			t.Parallel()
+
+			valid := IsValid(tt.in)
+			if valid != tt.valid {
+				t.Errorf("IsValid(%s) got %v want %v", tt.in, valid, tt.valid)
+			}
+		})
+	}
+}
+
 func TestString(t *testing.T) {
 	t.Parallel()
 
