@@ -1,6 +1,9 @@
 package math
 
-import stdmath "math"
+import (
+	"context"
+	stdmath "math"
+)
 
 func IsPrime(n int) bool {
 	for i := 2; i <= int(stdmath.Sqrt(float64(n))); i++ {
@@ -50,6 +53,28 @@ func PrimesUntil(n int, f func(n, i int) bool) chan int {
 			if IsPrime(i) {
 				ch <- i
 				count++
+			}
+		}
+	}()
+
+	return ch
+}
+
+// Primes generates prime numbers and sends them to the returned channel, which
+// is initialized with a buffer of n, until the given context is done.
+func Primes(ctx context.Context, n int) chan int {
+	ch := make(chan int, n)
+	go func() {
+		defer close(ch)
+
+		for i := 2; ; i++ {
+			select {
+			case <-ctx.Done():
+				return
+			default:
+				if IsPrime(i) {
+					ch <- i
+				}
 			}
 		}
 	}()
