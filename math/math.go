@@ -3,7 +3,9 @@ package math
 import (
 	"fmt"
 	"math/big"
+	"sort"
 	"strconv"
+	"strings"
 )
 
 // SumInts returns the sum of a slice of ints.
@@ -66,4 +68,35 @@ func SumDigitFactorials(n *big.Int) *big.Int {
 	}
 
 	return &sum
+}
+
+// Digits returns a slice of the digits of n.
+func Digits(n int) []int {
+	var bi big.Int
+	bi.SetInt64(int64(n))
+	s := bi.String()
+
+	digits := make([]int, len(s))
+	for i, c := range s {
+		d, err := strconv.ParseInt(string(c), 10, 64)
+		if err != nil {
+			panic(fmt.Sprintf("could not parse digit %d of %s: %s", i, s, err))
+		}
+		digits[i] = int(d)
+	}
+
+	return digits
+}
+
+// OrderedDigitsString returns the digits of n in increasing order as a string.
+func OrderedDigitsString(n int) string {
+	digits := Digits(n)
+	sort.Ints(digits)
+
+	buf := strings.Builder{}
+	for _, d := range digits {
+		buf.WriteString(fmt.Sprintf("%d", d))
+	}
+
+	return buf.String()
 }
